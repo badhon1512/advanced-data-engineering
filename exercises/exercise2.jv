@@ -1,0 +1,61 @@
+pipeline DataPipeline{
+    // Chain of the pipeline (Data/Block flow)
+    ExtractData
+        -> InterpretTextFile
+        -> InterpretCsvFile
+        -> DeleteFeature
+        -> InterpretTable
+        -> CreateDatabase;
+    // download the dataset
+    block ExtractData oftype HttpExtractor {url: "https://opendata.rhein-kreis-neuss.de/api/v2/catalog/datasets/stadt-neuss-herbstpflanzung-2023/exports/csv";}
+    // read the dataset as text
+    block InterpretTextFile oftype TextFileInterpreter {}
+    // read the dataset as csv
+    block InterpretCsvFile oftype CSVInterpreter { delimiter: ";"; }
+
+    // delete 'baumart_deutsch' feature
+    
+    block DeleteFeature oftype ColumnDeleter {
+        delete: [column E];
+    }
+    // interpret a sheet as a table 
+    block InterpretTable oftype TableInterpreter {
+        header: true;
+        columns: [
+            "lfd_nr" oftype integer,
+            "stadtteil" oftype StadtteilConstrain,
+            "standort" oftype text,
+            "baumart_botanisch" oftype text,
+            "id" oftype IDConstrain,
+            "baumfamilie" oftype text
+        ];
+    }
+
+    // Constrains
+    //only allow the values start with 'Vogelsang'
+    constraint StadtteilRegex oftype RegexConstraint {
+        regex: /^Vogelsang/;
+    }
+
+    // define value type for Stadtteil along the constrains
+
+    valuetype StadtteilConstrain oftype text {
+        constraints: [StadtteilRegex];
+    }
+
+    // Regex for ID
+    constraint IdRegex oftype RegexConstraint {
+        regex: /([0-9]{1,3}\.[0-9]+), ([0-9]{1,3}\.[0-9]+)/;
+    }
+    // Apply constrain for ID
+    valuetype IDConstrain oftype text {
+        constraints: [IdRegex];
+    }
+
+    // create the database and table with selected features
+
+    block CreateDatabase oftype SQLiteLoader {
+        table: "trees";
+        file: "./trees.sqlite";
+    }
+}
