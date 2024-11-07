@@ -22,15 +22,15 @@ There is a difference in lifestyle we can see in American countries, especially 
 * Data URL: https://www.kaggle.com/datasets/theworldbank/world-development-indicators?resource=download
 * Data Type: xls
 
-The World Development Indicators dataset includes data on many aspects like economy, health, and environment for countries around the world 
+The World Development Indicators dataset includes data on many aspects like economy, health, and environment for countries around the world.
 
 ### Datasource2: Health Nutrition and Population Statistics
 
 * Metadata URL: https://datacatalog1.worldbank.org/search/dataset/0037652/Health-Nutrition-and-Population-Statistics
 * Data URL: https://www.kaggle.com/datasets/theworldbank/health-nutrition-and-population-statistics
-* Data Type: xls
+* Data Type: csv
 
-The Health Nutrition and Population Statistics dataset from the World Bank includes data on global health, nutrition, and population trends
+The Health Nutrition and Population Statistics dataset from the World Bank includes data on global health, nutrition, and population trends.
 
 ## Work Packages
 
