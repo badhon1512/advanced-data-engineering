@@ -1,0 +1,95 @@
+pipeline DataPipeline{
+
+    // Chain of the pipeline (Data/Block flow)
+    ExtractData
+        -> InterpretXLSXFile
+        -> GetSheet
+        -> GetData
+        -> SetFeatureName
+        -> InterpretTable1
+        -> CreateTable1 ;
+    // 2nd table all previous functionalities are similar    
+    SetFeatureName
+        -> InterpretTable2
+        -> CreateTable2 ;    
+    
+    // download the dataset
+    block ExtractData oftype HttpExtractor {url: "https://thedocs.worldbank.org/en/doc/7d852628d96b9411d43e5d36d5dff941-0050062022/original/Graphs-Chapter-5-02082022.xlsx";}
+    
+    // Extract XLSX file
+    block InterpretXLSXFile oftype XLSXInterpreter {}
+
+    // Slecet the 'Figure S5.1.2' sheet from the file
+    block GetSheet oftype SheetPicker {sheetName: "Figure S5.1.2";}
+
+    // Get the actual that we are interested 
+    block GetData oftype CellRangeSelector {select: range P2:S45;}
+    
+    // New names for the features
+    block SetFeatureName oftype CellWriter {
+        at: range A1:D1;
+        write: ["Country Code", "Economy", "GDP per Capita", "Bond Issuance Share"];
+    }
+
+    // Only keep valid contry code 
+    valuetype ValidCode oftype CountryCodeAlpha3 {
+        constraints: [];
+    }
+    // must be a positive decimal // 0 not included >=0 
+    constraint GPDConstraint oftype RangeConstraint {
+        lowerBound: 0;
+        lowerBoundInclusive: false;
+    }
+    // GDP
+    valuetype ValidGDP oftype decimal {
+        constraints: [GPDConstraint];
+    }
+
+    // must be a decimal between 0 and 1 
+    constraint BondConstraint oftype RangeConstraint {
+        lowerBound: 0;
+        lowerBoundInclusive: true;
+        upperBound: 1;
+        upperBoundInclusive: true;
+    }
+    // Bond
+    valuetype ValidBond oftype decimal {
+        constraints: [BondConstraint];
+    }
+
+
+    // Table
+
+     block InterpretTable1 oftype TableInterpreter {
+        header: true;
+        columns: [
+        "Country Code" oftype ValidCode,
+        "Bond Issuance Share" oftype ValidBond
+        ];
+    }
+    
+    block InterpretTable2 oftype TableInterpreter {
+        header: true;
+        columns: [
+        "Country Code" oftype ValidCode,
+        "GDP per Capita" oftype ValidGDP,
+        ];
+    }
+
+
+    // create the database and table with selected features
+
+    block CreateTable1 oftype SQLiteLoader {
+        table: "bondIssuance";
+        file: "./country-stats.sqlite";
+    }
+
+    block CreateTable2 oftype SQLiteLoader {
+        table: "gdpPerCapita";
+        file: "./country-stats.sqlite";
+    }
+
+
+
+    
+}
