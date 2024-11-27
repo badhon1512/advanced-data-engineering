@@ -35,50 +35,59 @@ class DataPipeline:
     
     
     def preprocess_data(self):
-        for i in range(2):
 
-            if i == 0:
-                unusefull_features = ['Unnamed: 0', "Victim's name"]
-                self.dataframes[i]['USPoliceViolence'].drop(unusefull_features, axis=1)
-                self.dataframes[i]['USPoliceViolence'] = self.fill_nulls(self.dataframes[i]['USPoliceViolence'])
-            elif i == 1:    
-                # need to handle multiple data sets
-                # police killing dataset
-                unusefull_features = ['id', "name"]
-                self.dataframes[i]['PoliceKillingsUS'].drop(unusefull_features, axis=1)
-                self.dataframes[i]['PoliceKillingsUS'] = self.fill_nulls(self.dataframes[i]['PoliceKillingsUS'])
-                self.dataframes[i]['MedianHouseholdIncome2015'] = self.fill_nulls(self.dataframes[i]['MedianHouseholdIncome2015'])
-                self.dataframes[i]['PercentOver25CompletedHighSchool'] = self.fill_nulls(self.dataframes[i]['PercentOver25CompletedHighSchool'])
-                self.dataframes[i]['PercentagePeopleBelowPovertyLevel'] = self.fill_nulls(self.dataframes[i]['PercentagePeopleBelowPovertyLevel'])
-                self.dataframes[i]['ShareRaceByCity'] = self.fill_nulls(self.dataframes[i]['ShareRaceByCity'])
+       for i in range(2):
 
+         if i == 0:
+             unusefull_features = ['Unnamed: 0', "Victim's name"]
+             self.dataframes[i][list(self.dataframes[i].keys())[0]].drop(unusefull_features, axis=1,  errors='ignore', inplace=True)
+             self.dataframes[i][list(self.dataframes[i].keys())[0]] = self.fill_nulls(self.dataframes[i][list(self.dataframes[i].keys())[0]])
+         elif i == 1:    
+             # need to handle multiple data sets
+             self.dataframes[i]['Hate Crimes'] = pd.DataFrame(columns=self.dataframes[i][list(self.dataframes[i].keys())[0]].columns)
+ 
+             for key in list(self.dataframes[i].keys()):
+                if key != 'Hate Crimes':  # Skip the key being created
+                    hc = self.dataframes[i][key]
+                    self.dataframes[i]['Hate Crimes'] = pd.concat([self.dataframes[i]['Hate Crimes'], hc], ignore_index=True)
+                    del self.dataframes[i][key]  # Safely delete the original DataFrame
+             
+             
+             # Convert INCIDENT_DATE to datetime
+             self.dataframes[i]['Hate Crimes']['INCIDENT_DATE'] = pd.to_datetime(self.dataframes[i]['Hate Crimes']['INCIDENT_DATE'], format='%d-%b-%y', errors='coerce')
+            
+             # Filter data for 2013-2020
+             self.dataframes[i]['Hate Crimes'] = self.dataframes[i]['Hate Crimes'][
+                (self.dataframes[i]['Hate Crimes']['INCIDENT_DATE'].dt.year >= 2013) & 
+                (self.dataframes[i]['Hate Crimes']['INCIDENT_DATE'].dt.year <= 2020)
+             ]
+            
+             unusefull_features = ["Unnamed: 0", "PUB_AGENCY_UNIT", 'INCIDENT_ID', "PUB_AGENCY_NAME","AGENCY_TYPE_NAME", "ADULT_VICTIM_COUNT", "JUVENILE_VICTIM_COUNT", "ADULT_OFFENDER_COUNT", "JUVENILE_OFFENDER_COUNT","OFFENDER_ETHNICITY"]
+             self.dataframes[i]['Hate Crimes'].drop(unusefull_features, axis=1, errors='ignore', inplace=True)
+             self.dataframes[i][list(self.dataframes[i].keys())[0]] = self.fill_nulls(self.dataframes[i]['Hate Crimes'])
 
-                # now need to aggregate remaining dataframe and make a single dataframe, will think and do it later
-                #dataframes[i]['SocioeconomicFactorsbyCounty'] =  merge_datasets_on_unique_columns([dataframes[i]['MedianHouseholdIncome2015'], dataframes[i]['PercentOver25CompletedHighSchool'],
-                #                   dataframes[i]['PercentagePeopleBelowPovertyLevel'], dataframes[i]['ShareRaceByCity']])
-                # remove old dataframes  
-                #del dataframes[i]['MedianHouseholdIncome2015']
-                #del dataframes[i]['PercentOver25CompletedHighSchool']
-                #del dataframes[i]['PercentagePeopleBelowPovertyLevel']
-                #del dataframes[i]['ShareRaceByCity']
-       
     def fill_nulls(self, df):
+        
         df.dropna(thresh=2, inplace=True)  # Remove rows with 2 or more NA values
 
         for column in df.columns:
             if pd.api.types.is_numeric_dtype(df[column]):  # Check if the column is numeric (integer or float)
                 min_value = df[column].min()
                 df[column].fillna(min_value, inplace=True)
-            else:  # Check if the column is of string (object) type
-                mode_value = df[column].mode().iloc[0]  # Use the mode (most frequent value) for strings
-                df[column].fillna(mode_value, inplace=True)
-                
-        return df            
+            else:  # For string (object) type columns
+                mode_value = df[column].mode()
+                if not mode_value.empty:  # Check if mode exists
+                    df[column].fillna(mode_value.iloc[0], inplace=True)
+                else:
+                    df[column].fillna("Unknown", inplace=True)  # Use a default value for empty modes
+        return df
+            
 
     def save_data_to_sqlite(self, database_name="US"):
 
         self.get_dataframes()
         self.preprocess_data()
+
 
         # Define the database path and create the directory if it doesn't exist
         path = 'sqlite:///data//' + database_name + '.sqlite'
@@ -99,5 +108,5 @@ class DataPipeline:
 
 if __name__ == '__main__':
 
-    pipeline = DataPipeline(['jamesvandenberg/us-police-shootings-20132020', 'kwullum/fatal-police-shootings-in-the-us'])
+    pipeline = DataPipeline(['jamesvandenberg/us-police-shootings-20132020', 'jonathanrevere/fbi-hate-crimes-in-usa-19912020'])
     pipeline.save_data_to_sqlite()

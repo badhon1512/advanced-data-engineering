@@ -1,35 +1,43 @@
 # Project Plan
 ## Title
-Analyzing the Impact of Socioeconomic Factors on Police Shootings in America: A U.S. County-Level Study
+Analysis of the Impact of Hate Crimes on Police Shootings in the United States
 ## Main Question
 
 <!-- Think about one main question you want to answer based on the data. -->
-1. How do socioeconomic factors (income, education, poverty, racial composition, and crime) relate to the frequency and distribution of police shootings in U.S. counties?
+1. Do US states with high hate crime rates experience higher rates of fatal police shootings?
 
 ## Description
 
 <!-- Describe your data science project in max. 200 words. Consider writing about why and how you attempt it. -->
-Nowadays, police firing is a common case in the USA. There are several reasons for this, and it happens more frequently in some areas. I have collected a dataset for U.S. counties that contains socioeconomic information about these counties. I have selected two other datasets for police firing cases. My goal is to explore the main causes of these incidents and identify patterns in certain cities.
+The police shootings are increasing day by day in the USA. The main aim of this
+research is to explore if the cities with high hate crime rates in the USA experience
+more police shooting incidents. Additionally, factors such as the racial identity of a
+person, gender, or age have any influence on hate crimes and police shootings. To do
+this, two datasets have been selected - one contains the hate crimes data in the states
+of the USA, and the other dataset contains the police shooting records.
 
 ## Datasources
 
 <!-- Describe each datasources you plan to use in a section. Use the prefic "DatasourceX" where X is the id of the datasource. -->
 
-### Datasource1: Fatal Police Shootings in the US
 
-* Metadata URL: https://www.kaggle.com/datasets/kwullum/fatal-police-shootings-in-the-us
-* Data URL: https://www.kaggle.com/datasets/kwullum/fatal-police-shootings-in-the-us
-* Data Type: csv
 
-This datasouce cotains the police shooting data from 2015 to 2017, additionally, it provides the information about the socioeconomic of the counties.
-
-### Datasource2: U.S Police Shootings 2013-2020
+### Datasource1: U.S Police Shootings 2013-2020
 
 * Metadata URL: https://www.kaggle.com/datasets/jamesvandenberg/us-police-shootings-20132020
 * Data URL: https://www.kaggle.com/datasets/jamesvandenberg/us-police-shootings-20132020
 * Data Type: csv
 
 This datasouce cotains the police shooting data from 2013 to 2020.
+
+### Datasource2: FBI Hate Crimes in USA (1991-2020)
+
+* Metadata URL: https://www.kaggle.com/datasets/jonathanrevere/fbi-hate-crimes-in-usa-19912020
+* Data URL: https://www.kaggle.com/datasets/jonathanrevere/fbi-hate-crimes-in-usa-19912020
+* Data Type: csv
+
+This dataset contains hate crime information across US states from
+1999 to 2020.
 
 ## Work Packages
 
