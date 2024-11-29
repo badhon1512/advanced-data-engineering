@@ -4,6 +4,8 @@ import pandas as pd
 from kaggle.api.kaggle_api_extended import KaggleApi
 import tempfile
 from sqlalchemy import create_engine
+import tempfile
+
 
 class DataPipeline:
     def __init__(self, data_sources) -> None:
@@ -11,6 +13,11 @@ class DataPipeline:
         self.dataframes= []
         self.api = KaggleApi()
         self.api.authenticate()
+
+        # Get the absolute path of the main directory (one level up from the project directory)
+        self.main_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))  # Main directory
+        self.data_dir = os.path.join(self.main_dir, "data")  # Path to the 'data' folder in the main directory
+        os.makedirs(self.data_dir, exist_ok=True)  # Ensure the 'data' directory exists
 
     def get_dataframes(self):
         
@@ -88,25 +95,21 @@ class DataPipeline:
         self.get_dataframes()
         self.preprocess_data()
 
+        # Define the SQLite database path
+        self.db_path = os.path.join(self.data_dir, f"{database_name}.sqlite")
 
-        # Define the database path and create the directory if it doesn't exist
-        path = 'sqlite:///data//' + database_name + '.sqlite'
-        engine = create_engine(path, echo=False)
-        
-        # Save each DataFrame in the dictionary as a separate table in the database
+        # Create SQLite engine
+        self.engine = create_engine(f"sqlite:///{self.db_path}", echo=False)
+
+        # Save each DataFrame to the database
         for dataset in self.dataframes:
             for table_name, df in dataset.items():
-               # print(table_name, df.isnull().sum())
-                df.to_sql(table_name, engine, if_exists='replace', index=False)
+                df.to_sql(table_name, self.engine, if_exists='replace', index=False)
                 print(f"Data saved to table '{table_name}' in database '{database_name}.sqlite'.")
-        
-        # Dispose of the engine when done
-        engine.dispose()
 
-                            
+        self.engine.dispose()
 
 
 if __name__ == '__main__':
-
     pipeline = DataPipeline(['jamesvandenberg/us-police-shootings-20132020', 'jonathanrevere/fbi-hate-crimes-in-usa-19912020'])
     pipeline.save_data_to_sqlite()
