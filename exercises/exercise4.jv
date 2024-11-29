@@ -1,0 +1,97 @@
+pipeline DataPipeline {
+
+    block ExtractData oftype HttpExtractor {url:  "https://www.mowesta.com/data/measure/mowesta-dataset-20221107.zip";}
+
+    block ArchiveData oftype ArchiveInterpreter {
+        archiveType: "zip";
+    }
+
+    block PickData oftype FilePicker {
+        path:'/data.csv';
+    }
+
+	block InterpretTextFile oftype TextFileInterpreter {}
+
+	block InterpretCsvFile oftype CSVInterpreter { delimiter: ";";}
+
+    block SetFeatureName oftype CellWriter {
+        at: range A1:E1;
+        write: ["id", "producer","model","month","temperature"];
+    }
+
+    block SetFeatureNameBattery oftype CellWriter {
+        at: cell J1;
+        write:["battery_temperature"];
+    }
+
+
+    // Transform data from celsius to Fahrenheit
+    transform Transform {
+        from c oftype decimal;
+        to f oftype decimal;
+        f: (c * 9/5) + 32;
+    }
+
+    block SetTempratureFahrenheit oftype TableTransformer {
+        inputColumns: ['temperature'];
+        outputColumn: 'temperature';
+        uses: Transform;
+    }
+
+    block SetBatteryTempratureFahrenheit oftype TableTransformer {
+        inputColumns: ['battery_temperature'];
+        outputColumn: 'battery_temperature';
+        uses: Transform;
+    }
+
+    // Constraints
+
+    constraint MonthConst oftype RangeConstraint {
+        lowerBound: 1;
+        lowerBoundInclusive: true;
+        upperBound: 12;
+        upperBoundInclusive: true;
+    }
+    
+    valuetype ValidMonth oftype integer {
+        constraints:[MonthConst];
+    }
+
+    constraint IdConst on integer:
+        value > 0;
+
+    valuetype ValidID oftype integer {
+        constraints: [IdConst];
+    }
+
+
+    block InterpretTable oftype TableInterpreter {
+        header:true;
+        columns: [
+            "id" oftype ValidID,
+            "producer" oftype text,
+            "model" oftype text,
+            "month" oftype ValidMonth,
+            "temperature" oftype decimal,
+            "battery_temperature" oftype decimal
+        ];
+    }
+
+    block CreateDatabase oftype SQLiteLoader {
+        table:'temperatures';
+        file:'temperatures.sqlite';
+    }
+    //pipeeline sequence
+     ExtractData
+        -> ArchiveData
+        -> PickData
+        -> InterpretTextFile
+        -> InterpretCsvFile
+        -> SetFeatureName
+        -> SetFeatureNameBattery
+        -> InterpretTable
+        -> SetBatteryTempratureFahrenheit
+        -> SetTempratureFahrenheit
+        -> CreateDatabase;
+  
+}
