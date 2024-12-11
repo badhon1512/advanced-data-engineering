@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  run-pipeline-tests:
+    runs-on: ubuntu-latest
+
+    env:
+      KAGGLE_USER_NAME: ${{ secrets.KAGGLE_USER_NAME }}
+      KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.13'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r ./project/requirements.txt
+
+    - name: Set Kaggle Credentials
+      run: |
+        mkdir -p ~/.kaggle
+        echo '{"username":"${{ secrets.KAGGLE_USER_NAME }}","key":"${{ secrets.KAGGLE_KEY }}"}' > ~/.kaggle/kaggle.json
+        chmod 600 ~/.kaggle/kaggle.json 
+
+    - name: Pipeline Tests
+      run: |
+        chmod +x ./project/tests.sh
+        ./project/tests.sh
