@@ -27,6 +27,12 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r ./project/requirements.txt
 
+    - name: Set Kaggle Credentials
+      run: |
+        mkdir -p ~/.kaggle
+        echo '{"username":"${{ secrets.KAGGLE_USER_NAME }}","key":"${{ secrets.KAGGLE_KEY }}"}' > ~/.kaggle/kaggle.json
+        chmod 600 ~/.kaggle/kaggle.json 
+
     - name: Pipeline Tests
       run: |
         chmod +x ./project/tests.sh
