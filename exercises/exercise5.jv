@@ -1,0 +1,71 @@
+pipeline DataPipeline {
+
+    block ExtractData oftype HttpExtractor {
+		url: "https://gtfs.rhoenenergie-bus.de/GTFS.zip";
+	}
+
+    block ArchiveData oftype ArchiveInterpreter {
+        archiveType: "zip";
+    }
+
+    block GetFile oftype FilePicker {
+        path:"/stops.txt";
+    }
+
+	block InterpretTextFile oftype TextFileInterpreter {}
+
+	block InterpretCsvFile oftype CSVInterpreter {
+		delimiter: ",";
+        enclosing: '"';
+	}
+
+    constraint StopName oftype RegexConstraint {
+        regex: /^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$/;
+    }
+
+    valuetype ValidStop oftype text {
+        constraints: [StopName];
+    }
+
+    constraint ZoneConstain on integer:
+        value == 1925;
+
+    valuetype ValidZone oftype integer {
+        constraints: [ZoneConstain];
+    }
+
+    constraint GeoConstain oftype RangeConstraint {
+        lowerBound: -90;
+        lowerBoundInclusive: true;
+        upperBound: 90;
+        upperBoundInclusive: true;
+    }
+
+    valuetype ValidGeo oftype decimal {
+        constraints: [GeoConstain];
+    }
+
+    block GTFSTableInterpreter oftype TableInterpreter {
+        header: true;
+        columns:[
+            "stop_id" oftype integer,
+            "stop_name" oftype text,
+            "stop_lat" oftype ValidGeo,
+            "stop_lon" oftype ValidGeo,
+            "zone_id" oftype ValidZone
+        ];
+    }
+
+    block CreateDatabase oftype SQLiteLoader {
+        table: "stops";
+        file: "./gtfs.sqlite";
+    }
+    //pipeeline sequence
+    ExtractData
+        -> ArchiveData
+        -> GetFile
+        -> InterpretTextFile
+        -> InterpretCsvFile
+        -> GTFSTableInterpreter
+        -> CreateDatabase;
+}
