@@ -1,4 +1,5 @@
-pandas==2.1.1              
+pandas==2.0.3
+numpy==1.25.0
 sqlalchemy==2.0.21
 kaggle==1.5.15
 pytest==7.4.2
