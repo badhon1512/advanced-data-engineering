@@ -1,3 +1,53 @@
+# Project Plan
+## Title
+Analysis of the Impact of Hate Crimes on Police Shootings in the United States
+## Main Question
+
+<!-- Think about one main question you want to answer based on the data. -->
+1. Do US states with high hate crime rates experience higher rates of fatal police shootings?
+
+## Description
+
+<!-- Describe your data science project in max. 200 words. Consider writing about why and how you attempt it. -->
+The police shootings are increasing day by day in the USA. The main aim of this
+research is to explore if the cities with high hate crime rates in the USA experience
+more police shooting incidents. Additionally, factors such as the racial identity of a
+person, gender, or age have any influence on hate crimes and police shootings. To do
+this, two datasets have been selected - one contains the hate crimes data in the states
+of the USA, and the other dataset contains the police shooting records.
+
+## Datasources
+
+<!-- Describe each datasources you plan to use in a section. Use the prefic "DatasourceX" where X is the id of the datasource. -->
+
+
+
+### Datasource1: U.S Police Shootings 2013-2020
+
+* Metadata URL: https://www.kaggle.com/datasets/jamesvandenberg/us-police-shootings-20132020
+* Data URL: https://www.kaggle.com/datasets/jamesvandenberg/us-police-shootings-20132020
+* Data Type: csv
+
+This datasouce cotains the police shooting data from 2013 to 2020.
+
+### Datasource2: FBI Hate Crimes in USA (1991-2020)
+
+* Metadata URL: https://www.kaggle.com/datasets/jonathanrevere/fbi-hate-crimes-in-usa-19912020
+* Data URL: https://www.kaggle.com/datasets/jonathanrevere/fbi-hate-crimes-in-usa-19912020
+* Data Type: csv
+
+This dataset contains hate crime information across US states from
+1999 to 2020.
+
+## Work Packages
+
+1. Select datasets
+2. Preprocess dataset
+3. Develop an automated data pipeline
+4. Perform Exploratory Data Analysis (EDA) and create features
+5. Interpret results, and gain insights
+6. Summarize findings
+
 # Methods of Advanced Data Engineering Template Project
 
 This template project provides some structure for your open data project in the MADE module at FAU.
