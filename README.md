@@ -1,20 +1,17 @@
-# Project Plan
-## Title
-Analysis of the Impact of Hate Crimes on Police Shootings in the United States
-## Main Question
 
-<!-- Think about one main question you want to answer based on the data. -->
-1. Do US states with high hate crime rates experience higher rates of fatal police shootings?
-
-## Description
+#### Analysis of the Impact of Hate Crimes on Police Shootings in the United States
 
 <!-- Describe your data science project in max. 200 words. Consider writing about why and how you attempt it. -->
 The police shootings are increasing day by day in the USA. The main aim of this
 research is to explore if the cities with high hate crime rates in the USA experience
-more police shooting incidents. Additionally, factors such as the racial identity of a
-person, gender, or age have any influence on hate crimes and police shootings. To do
+more police shooting incidents. Additionally, factors such as Hete crime types and Armed/Unarmed impacts on police shooting is discussed. To do
 this, two datasets have been selected - one contains the hate crimes data in the states
 of the USA, and the other dataset contains the police shooting records.
+
+## Main Question
+
+<!-- Think about one main question you want to answer based on the data. -->
+1. Do US states with high hate crime rates experience higher rates of fatal police shootings?
 
 ## Datasources
 
