@@ -1,5 +1,5 @@
 
-#### Analysis of the Impact of Hate Crimes on Police Shootings in the United States
+## Analysis of the Impact of Hate Crimes on Police Shootings in the United States
 
 <!-- Describe your data science project in max. 200 words. Consider writing about why and how you attempt it. -->
 The police shootings are increasing day by day in the USA. The main aim of this
